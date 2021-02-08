@@ -26,7 +26,7 @@ export async function fetchUsers({
         entityData: {
           source: user,
           assign: {
-            _type: 'acme_user',
+            _type: 'at_spoke_user',
             _class: 'User',
             username: 'testusername',
             email: 'test@test.com',

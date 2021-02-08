@@ -91,9 +91,10 @@ https://github.com/JupiterOne/sdk/blob/master/docs/integrations/development.md
 
 The following entities are created:
 
-| Resources | Entity `_type` | Entity `_class` |
-| --------- | -------------- | --------------- |
-| Account   | `acme_account` | `Account`       |
+| Resources | Entity `_type`     | Entity `_class` |
+| --------- | ------------------ | --------------- |
+| Account   | `at_spoke_account` | `Account`       |
+| Account   | `acme_account`     | `Account`       |
 
 ### Relationships
 

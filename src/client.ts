@@ -1,4 +1,5 @@
 import http from 'http';
+import axios, { AxiosInstance } from 'axios';
 
 import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
 
@@ -43,35 +44,38 @@ export type AcmeGroup = Opaque<any, 'AcmeGroup'>;
 export class APIClient {
   constructor(readonly config: IntegrationConfig) {}
 
+  getClient(): AxiosInstance {
+    const client = axios.create({
+      headers: {
+        get: {
+          client: 'JupiterOne-Spoke Integration client',
+          'Content-Type': 'application/json',
+          'Api-Key': this.config.apiKey,
+        },
+      },
+    });
+    return client;
+  }
+
   public async verifyAuthentication(): Promise<void> {
-    // TODO make the most light-weight request possible to validate
+    // the most light-weight request possible to validate
     // authentication works with the provided credentials, throw an err if
     // authentication fails
-    const request = new Promise((resolve, reject) => {
-      http.get(
-        {
-          hostname: 'localhost',
-          port: 443,
-          path: '/api/v1/some/endpoint?limit=1',
-          agent: false,
-          timeout: 10,
-        },
-        (res) => {
-          if (res.statusCode !== 200) {
-            reject(new Error('Provider authentication failed'));
-          } else {
-            resolve();
-          }
-        },
-      );
-    });
-
     try {
-      await request;
+      const reply = await this.getClient().get(
+        'https://api.askspoke.com/api/v1/whoami',
+      );
+      if (reply.status != 200) {
+        throw new IntegrationProviderAuthenticationError({
+          endpoint: 'https://api.askspoke.com/api/v1/whoami',
+          status: reply.status,
+          statusText: 'Received HTTP status other than 200',
+        });
+      }
     } catch (err) {
       throw new IntegrationProviderAuthenticationError({
         cause: err,
-        endpoint: 'https://localhost/api/v1/some/endpoint?limit=1',
+        endpoint: 'https://api.askspoke.com/api/v1/whoami',
         status: err.status,
         statusText: err.statusText,
       });
@@ -94,16 +98,28 @@ export class APIClient {
     // the page, invoke the `ResourceIteratee`. This will encourage a pattern
     // where each resource is processed and dropped from memory.
 
-    const users: AcmeUser[] = [
-      {
-        id: 'acme-user-1',
-        name: 'User One',
-      },
-      {
-        id: 'acme-user-2',
-        name: 'User Two',
-      },
-    ];
+    var reply;
+    try {
+      reply = await this.getClient().get(
+        'https://api.askspoke.com/api/v1/users',
+      );
+      if (reply.status != 200) {
+        throw new IntegrationProviderAuthenticationError({
+          endpoint: 'https://api.askspoke.com/api/v1/users',
+          status: reply.status,
+          statusText: 'Received HTTP status other than 200',
+        });
+      }
+    } catch (err) {
+      throw new IntegrationProviderAuthenticationError({
+        cause: err,
+        endpoint: 'https://api.askspoke.com/api/v1/users',
+        status: err.status,
+        statusText: err.statusText,
+      });
+    }
+
+    const users = reply.data.results; //todo : add typing for users
 
     for (const user of users) {
       await iteratee(user);
