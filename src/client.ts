@@ -1,7 +1,10 @@
 import http from 'http';
 import axios, { AxiosInstance } from 'axios';
 
-import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
+import {
+  GraphObjectLookupKey,
+  IntegrationProviderAuthenticationError,
+} from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig } from './types';
 
@@ -9,23 +12,38 @@ export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
 // Providers often supply types with their API libraries.
 
-type AcmeUser = {
+type AtSpokeUser = {
   id: string;
-  name: string;
+  displayName: string;
+  email: string;
+  isEmailVerified: boolean;
+  isProfileCompleted: boolean;
+  status: string;
+  profile?: object;
+  memberships?: string[];
+  startDate?: string;
 };
 
-type AcmeGroup = {
+type AtSpokeGroup = {
   id: string;
   name: string;
-  users?: Pick<AcmeUser, 'id'>[];
+  slug: string;
+  description: string;
+  keywords: string[];
+  icon: string;
+  color: string;
+  status: string;
+  goals: object;
+  agentList: object[];
+  createdAt: string;
+  updatedAt: string;
+  owner: string;
+  org: string;
+  email: string;
+  permalink: string;
+  settings?: object;
+  users?: Pick<AtSpokeUser, 'id'>[];
 };
-
-// Those can be useful to a degree, but often they're just full of optional
-// values. Understanding the response data may be more reliably accomplished by
-// reviewing the API response recordings produced by testing the wrapper client
-// (below). However, when there are no types provided, it is necessary to define
-// opaque types for each resource, to communicate the records that are expected
-// to come from an endpoint and are provided to iterating functions.
 
 /*
 import { Opaque } from 'type-fest';
@@ -88,7 +106,7 @@ export class APIClient {
    * @param iteratee receives each resource to produce entities/relationships
    */
   public async iterateUsers(
-    iteratee: ResourceIteratee<AcmeUser>,
+    iteratee: ResourceIteratee<AtSpokeUser>,
   ): Promise<void> {
     // TODO paginate an endpoint, invoke the iteratee with each record in the
     // page
@@ -98,7 +116,7 @@ export class APIClient {
     // the page, invoke the `ResourceIteratee`. This will encourage a pattern
     // where each resource is processed and dropped from memory.
 
-    var reply;
+    let reply;
     try {
       reply = await this.getClient().get(
         'https://api.askspoke.com/api/v1/users',
@@ -119,7 +137,8 @@ export class APIClient {
       });
     }
 
-    const users = reply.data.results; //todo : add typing for users
+    const users: AtSpokeUser[] = reply.data.results;
+    //to do: add try
 
     for (const user of users) {
       await iteratee(user);
@@ -132,7 +151,7 @@ export class APIClient {
    * @param iteratee receives each resource to produce entities/relationships
    */
   public async iterateGroups(
-    iteratee: ResourceIteratee<AcmeGroup>,
+    iteratee: ResourceIteratee<AtSpokeGroup>,
   ): Promise<void> {
     // TODO paginate an endpoint, invoke the iteratee with each record in the
     // page
@@ -142,17 +161,29 @@ export class APIClient {
     // the page, invoke the `ResourceIteratee`. This will encourage a pattern
     // where each resource is processed and dropped from memory.
 
-    const groups: AcmeGroup[] = [
-      {
-        id: 'acme-group-1',
-        name: 'Group One',
-        users: [
-          {
-            id: 'acme-user-1',
-          },
-        ],
-      },
-    ];
+    let reply;
+    try {
+      reply = await this.getClient().get(
+        'https://api.askspoke.com/api/v1/teams',
+      );
+      if (reply.status != 200) {
+        throw new IntegrationProviderAuthenticationError({
+          endpoint: 'https://api.askspoke.com/api/v1/teams',
+          status: reply.status,
+          statusText: 'Received HTTP status other than 200',
+        });
+      }
+    } catch (err) {
+      throw new IntegrationProviderAuthenticationError({
+        cause: err,
+        endpoint: 'https://api.askspoke.com/api/v1/teams',
+        status: err.status,
+        statusText: err.statusText,
+      });
+    }
+
+    const groups: AtSpokeGroup[] = reply.data.results;
+    //to do: add try
 
     for (const group of groups) {
       await iteratee(group);

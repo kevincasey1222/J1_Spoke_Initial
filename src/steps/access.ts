@@ -28,11 +28,15 @@ export async function fetchUsers({
           assign: {
             _type: 'at_spoke_user',
             _class: 'User',
-            username: 'testusername',
-            email: 'test@test.com',
-            // This is a custom property that is not a part of the data model class
-            // hierarchy. See: https://github.com/JupiterOne/data-model/blob/master/src/schemas/User.json
-            firstName: 'John',
+            _key: user.id,
+            username: user.displayName,
+            name: user.displayName,
+            displayName: user.displayName,
+            email: user.email,
+            isEmailVerified: user.isEmailVerified,
+            isProfileCompleted: user.isProfileCompleted,
+            status: user.status,
+            memberships: user.memberships,
           },
         },
       }),
