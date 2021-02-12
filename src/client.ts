@@ -86,25 +86,11 @@ export class APIClient {
     // the most light-weight request possible to validate
     // authentication works with the provided credentials, throw an err if
     // authentication fails
-    try {
-      const reply = await this.getClient().get(
-        'https://api.askspoke.com/api/v1/whoami',
-      );
-      if (reply.status != 200) {
-        throw new IntegrationProviderAuthenticationError({
-          endpoint: 'https://api.askspoke.com/api/v1/whoami',
-          status: reply.status,
-          statusText: 'Received HTTP status other than 200',
-        });
-      }
-    } catch (err) {
-      throw new IntegrationProviderAuthenticationError({
-        cause: err,
-        endpoint: 'https://api.askspoke.com/api/v1/whoami',
-        status: err.status,
-        statusText: err.statusText,
-      });
-    }
+    await this.contactAPI('https://api.askspoke.com/api/v1/whoami');
+  }
+
+  public async getAccountInfo() {
+    return await this.contactAPI('https://api.askspoke.com/api/v1/whoami');
   }
 
   /**
@@ -115,37 +101,11 @@ export class APIClient {
   public async iterateUsers(
     iteratee: ResourceIteratee<AtSpokeUser>,
   ): Promise<void> {
-    // TODO paginate an endpoint, invoke the iteratee with each record in the
-    // page
-    //
-    // The provider API will hopefully support pagination. Functions like this
-    // should maintain pagination state, and for each page, for each record in
-    // the page, invoke the `ResourceIteratee`. This will encourage a pattern
-    // where each resource is processed and dropped from memory.
+    const reply = await this.contactAPI(
+      'https://api.askspoke.com/api/v1/users',
+    );
 
-    let reply;
-    try {
-      reply = await this.getClient().get(
-        'https://api.askspoke.com/api/v1/users',
-      );
-      if (reply.status != 200) {
-        throw new IntegrationProviderAuthenticationError({
-          endpoint: 'https://api.askspoke.com/api/v1/users',
-          status: reply.status,
-          statusText: 'Received HTTP status other than 200',
-        });
-      }
-    } catch (err) {
-      throw new IntegrationProviderAuthenticationError({
-        cause: err,
-        endpoint: 'https://api.askspoke.com/api/v1/users',
-        status: err.status,
-        statusText: err.statusText,
-      });
-    }
-
-    const users: AtSpokeUser[] = reply.data.results;
-    //to do: add try
+    const users: AtSpokeUser[] = reply.results;
 
     for (const user of users) {
       await iteratee(user);
@@ -160,37 +120,11 @@ export class APIClient {
   public async iterateGroups(
     iteratee: ResourceIteratee<AtSpokeGroup>,
   ): Promise<void> {
-    // TODO paginate an endpoint, invoke the iteratee with each record in the
-    // page
-    //
-    // The provider API will hopefully support pagination. Functions like this
-    // should maintain pagination state, and for each page, for each record in
-    // the page, invoke the `ResourceIteratee`. This will encourage a pattern
-    // where each resource is processed and dropped from memory.
+    const reply = await this.contactAPI(
+      'https://api.askspoke.com/api/v1/teams',
+    );
 
-    let reply;
-    try {
-      reply = await this.getClient().get(
-        'https://api.askspoke.com/api/v1/teams',
-      );
-      if (reply.status != 200) {
-        throw new IntegrationProviderAuthenticationError({
-          endpoint: 'https://api.askspoke.com/api/v1/teams',
-          status: reply.status,
-          statusText: 'Received HTTP status other than 200',
-        });
-      }
-    } catch (err) {
-      throw new IntegrationProviderAuthenticationError({
-        cause: err,
-        endpoint: 'https://api.askspoke.com/api/v1/teams',
-        status: err.status,
-        statusText: err.statusText,
-      });
-    }
-
-    const groups: AtSpokeGroup[] = reply.data.results;
-    //to do: add try
+    const groups: AtSpokeGroup[] = reply.results;
 
     for (const group of groups) {
       if (group.users === undefined) {
@@ -200,6 +134,28 @@ export class APIClient {
         group.users.push(agent.user);
       }
       await iteratee(group);
+    }
+  }
+
+  public async contactAPI(url) {
+    let reply;
+    try {
+      reply = await this.getClient().get(url);
+      if (reply.status != 200) {
+        throw new IntegrationProviderAuthenticationError({
+          endpoint: url,
+          status: reply.status,
+          statusText: `Received HTTP status ${reply.status}`,
+        });
+      }
+      return reply.data;
+    } catch (err) {
+      throw new IntegrationProviderAuthenticationError({
+        cause: err,
+        endpoint: url,
+        status: err.status,
+        statusText: err.statusText,
+      });
     }
   }
 }

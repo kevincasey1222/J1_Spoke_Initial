@@ -29,6 +29,10 @@ export async function fetchUsers({
       graphName = user.email;
     }
 
+    //a weblink is not included in the API user object, but it exists and is derivable
+    //it is https://<accountEntity.org>.askspoke.com/users/user.id
+    var permalink = `https://${accountEntity.org}.askspoke.com/users/${user.id}`;
+
     const userEntity = await jobState.addEntity(
       createIntegrationEntity({
         entityData: {
@@ -40,6 +44,7 @@ export async function fetchUsers({
             username: graphName,
             name: graphName,
             displayName: graphName,
+            webLink: permalink,
             email: user.email,
             isEmailVerified: user.isEmailVerified,
             isProfileCompleted: user.isProfileCompleted,

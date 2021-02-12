@@ -5,6 +5,7 @@ import {
 } from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig } from '../types';
+import { createAPIClient } from '../client';
 
 export const ACCOUNT_ENTITY_KEY = 'at_spoke_account';
 
@@ -12,7 +13,9 @@ export async function fetchAccountDetails({
   instance,
   jobState,
 }: IntegrationStepExecutionContext<IntegrationConfig>) {
-  const name = `atSpoke - ${instance.name}`;
+  const apiClient = createAPIClient(instance.config);
+  const acctInfo = await apiClient.getAccountInfo();
+  const name = `atSpoke ${acctInfo.org} - ${instance.name}`;
   const accountEntity = await jobState.addEntity(
     createIntegrationEntity({
       entityData: {
@@ -26,6 +29,7 @@ export async function fetchAccountDetails({
           _class: 'Account',
           name,
           displayName: name,
+          org: acctInfo.org,
         },
       },
     }),
