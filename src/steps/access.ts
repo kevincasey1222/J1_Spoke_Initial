@@ -21,6 +21,14 @@ export async function fetchUsers({
   const accountEntity = (await jobState.getData(ACCOUNT_ENTITY_KEY)) as Entity;
 
   await apiClient.iterateUsers(async (user) => {
+    //real names are optional for atSpoke users
+    var graphName;
+    if (user.displayName) {
+      graphName = user.displayName;
+    } else {
+      graphName = user.email;
+    }
+
     const userEntity = await jobState.addEntity(
       createIntegrationEntity({
         entityData: {
@@ -29,9 +37,9 @@ export async function fetchUsers({
             _type: 'at_spoke_user',
             _class: 'User',
             _key: user.id,
-            username: user.displayName,
-            name: user.displayName,
-            displayName: user.displayName,
+            username: graphName,
+            name: graphName,
+            displayName: graphName,
             email: user.email,
             isEmailVerified: user.isEmailVerified,
             isProfileCompleted: user.isProfileCompleted,
@@ -66,7 +74,7 @@ export async function fetchGroups({
         entityData: {
           source: group,
           assign: {
-            _type: 'at_spoke_group',
+            _type: 'at_spoke_team',
             _class: 'UserGroup',
             _key: group.id,
             email: group.email,
@@ -114,9 +122,14 @@ export const accessSteps: IntegrationStep<IntegrationConfig>[] = [
     name: 'Fetch Users',
     entities: [
       {
-        resourceName: 'Account',
+        resourceName: 'atSpoke Account',
         _type: 'at_spoke_account',
         _class: 'Account',
+      },
+      {
+        resourceName: 'atSpoke User',
+        _type: 'at_spoke_user',
+        _class: 'User',
       },
     ],
     relationships: [
@@ -124,18 +137,6 @@ export const accessSteps: IntegrationStep<IntegrationConfig>[] = [
         _type: 'at_spoke_account_has_user',
         _class: RelationshipClass.HAS,
         sourceType: 'at_spoke_account',
-        targetType: 'at_spoke_user',
-      },
-      {
-        _type: 'at_spoke_account_has_group',
-        _class: RelationshipClass.HAS,
-        sourceType: 'at_spoke_account',
-        targetType: 'at_spoke_group',
-      },
-      {
-        _type: 'at_spoke_group_has_user',
-        _class: RelationshipClass.HAS,
-        sourceType: 'at_spoke_group',
         targetType: 'at_spoke_user',
       },
     ],
@@ -147,9 +148,19 @@ export const accessSteps: IntegrationStep<IntegrationConfig>[] = [
     name: 'Fetch UserGroups',
     entities: [
       {
-        resourceName: 'Account',
+        resourceName: 'atSpoke Account',
         _type: 'at_spoke_account',
         _class: 'Account',
+      },
+      {
+        resourceName: 'atSpoke User',
+        _type: 'at_spoke_user',
+        _class: 'User',
+      },
+      {
+        resourceName: 'atSpoke Team',
+        _type: 'at_spoke_team',
+        _class: 'UserGroup',
       },
     ],
     relationships: [
@@ -160,15 +171,15 @@ export const accessSteps: IntegrationStep<IntegrationConfig>[] = [
         targetType: 'at_spoke_user',
       },
       {
-        _type: 'at_spoke_account_has_group',
+        _type: 'at_spoke_account_has_team',
         _class: RelationshipClass.HAS,
         sourceType: 'at_spoke_account',
-        targetType: 'at_spoke_group',
+        targetType: 'at_spoke_team',
       },
       {
-        _type: 'at_spoke_group_has_user',
+        _type: 'at_spoke_team_has_user',
         _class: RelationshipClass.HAS,
-        sourceType: 'at_spoke_group',
+        sourceType: 'at_spoke_team',
         targetType: 'at_spoke_user',
       },
     ],

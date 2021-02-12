@@ -40,7 +40,7 @@ export const accountSteps: IntegrationStep<IntegrationConfig>[] = [
     name: 'Fetch Account Details',
     entities: [
       {
-        resourceName: 'Account',
+        resourceName: 'atSpoke Account',
         _type: ACCOUNT_ENTITY_KEY,
         _class: 'Account',
       },
