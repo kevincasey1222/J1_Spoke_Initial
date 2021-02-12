@@ -1,10 +1,6 @@
-import http from 'http';
 import axios, { AxiosInstance } from 'axios';
 
-import {
-  GraphObjectLookupKey,
-  IntegrationProviderAuthenticationError,
-} from '@jupiterone/integration-sdk-core';
+import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
 
 import { IntegrationConfig } from './types';
 
@@ -50,6 +46,15 @@ type AtSpokeAgentListItem = {
   status: string;
   teamRole: string;
   user: AtSpokeUser;
+};
+
+type AtSpokeWebhook = {
+  enabled: boolean;
+  topics: string[];
+  url: string;
+  client: string;
+  description: string;
+  id: string;
 };
 
 /*
@@ -134,6 +139,25 @@ export class APIClient {
         group.users.push(agent.user);
       }
       await iteratee(group);
+    }
+  }
+
+  /**
+   * Iterates each webhook resource in the provider.
+   *
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateWebhooks(
+    iteratee: ResourceIteratee<AtSpokeWebhook>,
+  ): Promise<void> {
+    const reply = await this.contactAPI(
+      'https://api.askspoke.com/api/v1/webhooks',
+    );
+
+    const webhooks: AtSpokeWebhook[] = reply.results;
+
+    for (const webhook of webhooks) {
+      await iteratee(webhook);
     }
   }
 

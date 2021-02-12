@@ -37,10 +37,7 @@ Given this example configuration:
 import { IntegrationInstanceConfigFieldMap } from '@jupiterone/integration-sdk-core';
 
 const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
-  clientId: {
-    type: 'string',
-  },
-  clientSecret: {
+  apiKey: {
     type: 'string',
     mask: true,
   },
@@ -52,15 +49,22 @@ export default instanceConfigFields;
 You would provide a `.env` file like this:
 
 ```bash
-CLIENT_ID="client-id"
-CLIENT_SECRET="supersecret"
+API_KEY="gobbeldygookgobbeldygook="
 ```
 
 The snake cased environment variables will automatically be converted and
-applied to the camel cased configuration field. So for example, `CLIENT_ID` will
-apply to the `clientId` config field, `CLIENT_SECRET` will apply to
-`clientSecret`, and `MY_SUPER_SECRET_CONFIGURATION_VALUE` will apply to a
-`mySuperSecretConfigurationValue` configuration field.
+applied to the camel cased configuration field. So for example, `API_KEY` will
+apply to the `apiKey` config field. If there were more fields, `CLIENT_SECRET`
+would apply to `clientSecret`, and `MY_SUPER_SECRET_CONFIGURATION_VALUE` would
+apply to a `mySuperSecretConfigurationValue` configuration field.
+
+## Getting an API Key from atSpoke
+
+To get an API Key from atSpoke, go to My Profile, select the API tab, and then
+generate a token at the bottom of the page. Note you can only have one token for
+the whole atSpoke account, and it has access to all things. Also note that you
+can only create an API token if you have a Business or Enterprise level account
+(the basic Teams account does not provide API functionality).
 
 ## Running the integration
 

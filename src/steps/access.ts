@@ -22,7 +22,7 @@ export async function fetchUsers({
 
   await apiClient.iterateUsers(async (user) => {
     //real names are optional for atSpoke users
-    var graphName;
+    let graphName;
     if (user.displayName) {
       graphName = user.displayName;
     } else {
@@ -31,7 +31,7 @@ export async function fetchUsers({
 
     //a weblink is not included in the API user object, but it exists and is derivable
     //it is https://<accountEntity.org>.askspoke.com/users/user.id
-    var permalink = `https://${accountEntity.org}.askspoke.com/users/${user.id}`;
+    const permalink = `https://${accountEntity.org}.askspoke.com/users/${user.id}`;
 
     const userEntity = await jobState.addEntity(
       createIntegrationEntity({

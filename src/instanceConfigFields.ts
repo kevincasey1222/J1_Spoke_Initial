@@ -3,6 +3,7 @@ import { IntegrationInstanceConfigFieldMap } from '@jupiterone/integration-sdk-c
 const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
   apiKey: {
     type: 'string',
+    mask: true,
   },
 };
 

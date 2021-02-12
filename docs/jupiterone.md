@@ -91,11 +91,12 @@ https://github.com/JupiterOne/sdk/blob/master/docs/integrations/development.md
 
 The following entities are created:
 
-| Resources       | Entity `_type`     | Entity `_class` |
-| --------------- | ------------------ | --------------- |
-| atSpoke Account | `at_spoke_account` | `Account`       |
-| atSpoke User    | `at_spoke_user`    | `User`          |
-| atSpoke Team    | `at_spoke_team`    | `UserGroup`     |
+| Resources       | Entity `_type`     | Entity `_class`       |
+| --------------- | ------------------ | --------------------- |
+| atSpoke Account | `at_spoke_account` | `Account`             |
+| atSpoke User    | `at_spoke_user`    | `User`                |
+| atSpoke Team    | `at_spoke_team`    | `UserGroup`           |
+| atSpoke Webhook | `at_spoke_webhook` | `ApplicationEndpoint` |
 
 ### Relationships
 
@@ -106,6 +107,7 @@ The following relationships are created/mapped:
 | `at_spoke_account`    | **HAS**               | `at_spoke_user`       |
 | `at_spoke_account`    | **HAS**               | `at_spoke_team`       |
 | `at_spoke_team`       | **HAS**               | `at_spoke_user`       |
+| `at_spoke_account`    | **HAS**               | `at_spoke_webhook`    |
 
 <!--
 ********************************************************************************
