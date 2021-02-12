@@ -94,7 +94,6 @@ The following entities are created:
 | Resources | Entity `_type`     | Entity `_class` |
 | --------- | ------------------ | --------------- |
 | Account   | `at_spoke_account` | `Account`       |
-| Account   | `acme_account`     | `Account`       |
 
 ### Relationships
 
@@ -102,9 +101,9 @@ The following relationships are created/mapped:
 
 | Source Entity `_type` | Relationship `_class` | Target Entity `_type` |
 | --------------------- | --------------------- | --------------------- |
-| `acme_account`        | **HAS**               | `acme_user`           |
-| `acme_account`        | **HAS**               | `acme_group`          |
-| `acme_group`          | **HAS**               | `acme_user`           |
+| `at_spoke_account`    | **HAS**               | `at_spoke_user`       |
+| `at_spoke_account`    | **HAS**               | `at_spoke_group`      |
+| `at_spoke_group`      | **HAS**               | `at_spoke_user`       |
 
 <!--
 ********************************************************************************

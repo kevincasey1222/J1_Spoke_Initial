@@ -66,12 +66,15 @@ export async function fetchGroups({
         entityData: {
           source: group,
           assign: {
-            _type: 'acme_group',
+            _type: 'at_spoke_group',
             _class: 'UserGroup',
-            email: 'testgroup@test.com',
-            // This is a custom property that is not a part of the data model class
-            // hierarchy. See: https://github.com/JupiterOne/data-model/blob/master/src/schemas/UserGroup.json
-            logoLink: 'https://test.com/logo.png',
+            _key: group.id,
+            email: group.email,
+            name: group.name,
+            displayName: group.name,
+            description: group.description,
+            org: group.org,
+            webLink: group.permalink,
           },
         },
       }),
@@ -112,31 +115,64 @@ export const accessSteps: IntegrationStep<IntegrationConfig>[] = [
     entities: [
       {
         resourceName: 'Account',
-        _type: 'acme_account',
+        _type: 'at_spoke_account',
         _class: 'Account',
       },
     ],
     relationships: [
       {
-        _type: 'acme_account_has_user',
+        _type: 'at_spoke_account_has_user',
         _class: RelationshipClass.HAS,
-        sourceType: 'acme_account',
-        targetType: 'acme_user',
+        sourceType: 'at_spoke_account',
+        targetType: 'at_spoke_user',
       },
       {
-        _type: 'acme_account_has_group',
+        _type: 'at_spoke_account_has_group',
         _class: RelationshipClass.HAS,
-        sourceType: 'acme_account',
-        targetType: 'acme_group',
+        sourceType: 'at_spoke_account',
+        targetType: 'at_spoke_group',
       },
       {
-        _type: 'acme_group_has_user',
+        _type: 'at_spoke_group_has_user',
         _class: RelationshipClass.HAS,
-        sourceType: 'acme_group',
-        targetType: 'acme_user',
+        sourceType: 'at_spoke_group',
+        targetType: 'at_spoke_user',
       },
     ],
     dependsOn: ['fetch-account'],
     executionHandler: fetchUsers,
+  },
+  {
+    id: 'fetch-groups',
+    name: 'Fetch UserGroups',
+    entities: [
+      {
+        resourceName: 'Account',
+        _type: 'at_spoke_account',
+        _class: 'Account',
+      },
+    ],
+    relationships: [
+      {
+        _type: 'at_spoke_account_has_user',
+        _class: RelationshipClass.HAS,
+        sourceType: 'at_spoke_account',
+        targetType: 'at_spoke_user',
+      },
+      {
+        _type: 'at_spoke_account_has_group',
+        _class: RelationshipClass.HAS,
+        sourceType: 'at_spoke_account',
+        targetType: 'at_spoke_group',
+      },
+      {
+        _type: 'at_spoke_group_has_user',
+        _class: RelationshipClass.HAS,
+        sourceType: 'at_spoke_group',
+        targetType: 'at_spoke_user',
+      },
+    ],
+    dependsOn: ['fetch-users'],
+    executionHandler: fetchGroups,
   },
 ];

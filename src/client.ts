@@ -16,9 +16,9 @@ type AtSpokeUser = {
   id: string;
   displayName: string;
   email: string;
-  isEmailVerified: boolean;
-  isProfileCompleted: boolean;
-  status: string;
+  isEmailVerified?: boolean;
+  isProfileCompleted?: boolean;
+  status?: string;
   profile?: object;
   memberships?: string[];
   startDate?: string;
@@ -34,7 +34,7 @@ type AtSpokeGroup = {
   color: string;
   status: string;
   goals: object;
-  agentList: object[];
+  agentList: AtSpokeAgentListItem[];
   createdAt: string;
   updatedAt: string;
   owner: string;
@@ -43,6 +43,13 @@ type AtSpokeGroup = {
   permalink: string;
   settings?: object;
   users?: Pick<AtSpokeUser, 'id'>[];
+};
+
+type AtSpokeAgentListItem = {
+  timestamps?: object;
+  status: string;
+  teamRole: string;
+  user: AtSpokeUser;
 };
 
 /*
@@ -186,6 +193,12 @@ export class APIClient {
     //to do: add try
 
     for (const group of groups) {
+      if (group.users === undefined) {
+        group.users = [];
+      }
+      for (const agent of group.agentList) {
+        group.users.push(agent.user);
+      }
       await iteratee(group);
     }
   }
