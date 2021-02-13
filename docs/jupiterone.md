@@ -97,6 +97,7 @@ The following entities are created:
 | atSpoke User    | `at_spoke_user`    | `User`                |
 | atSpoke Team    | `at_spoke_team`    | `UserGroup`           |
 | atSpoke Webhook | `at_spoke_webhook` | `ApplicationEndpoint` |
+| atSpoke Request | `at_spoke_request` | `Record`              |
 
 ### Relationships
 
@@ -108,6 +109,7 @@ The following relationships are created/mapped:
 | `at_spoke_account`    | **HAS**               | `at_spoke_team`       |
 | `at_spoke_team`       | **HAS**               | `at_spoke_user`       |
 | `at_spoke_account`    | **HAS**               | `at_spoke_webhook`    |
+| `at_spoke_account`    | **HAS**               | `at_spoke_request`    |
 
 <!--
 ********************************************************************************

@@ -57,6 +57,30 @@ type AtSpokeWebhook = {
   id: string;
 };
 
+type AtSpokeRequest = {
+  subject: string;
+  requester: string;
+  owner: string;
+  status: string;
+  privacyLevel: string;
+  team: string;
+  org: string;
+  permalink: string;
+  id: string;
+  requestType?: string;
+  isAutoResolve: boolean;
+  isFiled: boolean;
+  email: string;
+};
+
+type AtSpokeRequestType = {
+  id: string;
+  status: string;
+  icon: string;
+  title: string;
+  description: string;
+};
+
 /*
 import { Opaque } from 'type-fest';
 export type AcmeUser = Opaque<any, 'AcmeUser'>;
@@ -99,7 +123,7 @@ export class APIClient {
   }
 
   /**
-   * Iterates each user resource in the provider.
+   * Iterates each atSpoke user.
    *
    * @param iteratee receives each resource to produce entities/relationships
    */
@@ -118,7 +142,7 @@ export class APIClient {
   }
 
   /**
-   * Iterates each group resource in the provider.
+   * Iterates each atSpoke team.
    *
    * @param iteratee receives each resource to produce entities/relationships
    */
@@ -143,7 +167,7 @@ export class APIClient {
   }
 
   /**
-   * Iterates each webhook resource in the provider.
+   * Iterates each atSpoke webhook.
    *
    * @param iteratee receives each resource to produce entities/relationships
    */
@@ -158,6 +182,44 @@ export class APIClient {
 
     for (const webhook of webhooks) {
       await iteratee(webhook);
+    }
+  }
+
+  /**
+   * Iterates each atSpoke request.
+   *
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateRequests(
+    iteratee: ResourceIteratee<AtSpokeRequest>,
+  ): Promise<void> {
+    const reply = await this.contactAPI(
+      'https://api.askspoke.com/api/v1/requests',
+    );
+
+    const requests: AtSpokeRequest[] = reply.results;
+
+    for (const request of requests) {
+      await iteratee(request);
+    }
+  }
+
+  /**
+   * Iterates each atSpoke request type.
+   *
+   * @param iteratee receives each resource to produce entities/relationships
+   */
+  public async iterateRequestTypes(
+    iteratee: ResourceIteratee<AtSpokeRequestType>,
+  ): Promise<void> {
+    const reply = await this.contactAPI(
+      'https://api.askspoke.com/api/v1/request_types',
+    );
+
+    const requestTypes: AtSpokeRequestType[] = reply.results;
+
+    for (const requestType of requestTypes) {
+      await iteratee(requestType);
     }
   }
 
