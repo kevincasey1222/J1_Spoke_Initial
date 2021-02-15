@@ -5,7 +5,7 @@ import {
   IntegrationStep,
   IntegrationStepExecutionContext,
   RelationshipClass,
-  IntegrationMissingKeyError,
+  //IntegrationMissingKeyError,
 } from '@jupiterone/integration-sdk-core';
 
 import { createAPIClient } from '../client';
@@ -49,7 +49,7 @@ export async function fetchRequests({
         to: requestEntity,
       }),
     );
-
+    /*
     if (request.requestType) {
       const requestTypeEntity = await jobState.findEntity(request.requestType);
       if (!requestTypeEntity) {
@@ -64,7 +64,7 @@ export async function fetchRequests({
           to: requestTypeEntity,
         }),
       );
-    }
+    } */
   });
 }
 

@@ -1,20 +1,37 @@
-import { createMockStepExecutionContext } from '@jupiterone/integration-sdk-testing';
+import {
+  createMockStepExecutionContext,
+  Recording,
+} from '@jupiterone/integration-sdk-testing';
 
 import { IntegrationConfig } from '../types';
+import { setupSpokeRecording } from '../../test/recording';
 import { fetchGroups, fetchUsers } from './access';
 import { fetchAccountDetails } from './account';
 import { fetchRequests } from './requests';
 import { fetchWebhooks } from './webhooks';
 
-const DEFAULT_API_KEY = 'dummy-api-key';
-const DEFAULT_API_REQUESTS = '0';
+const DEFAULT_API_KEY = 'AtFbNFj2hvzt7pGkg_zgW7ksihiFaVrVwttLKxU2oRVU=';
+const DEFAULT_API_REQUESTS = '5';
 
 const integrationConfig: IntegrationConfig = {
   apiKey: process.env.API_KEY || DEFAULT_API_KEY,
   numRequests: process.env.NUM_REQUESTS || DEFAULT_API_REQUESTS,
 };
 
+jest.setTimeout(1000 * 60 * 1);
+
+let recording: Recording;
+
+afterEach(async () => {
+  await recording.stop();
+});
+
 test('should collect data', async () => {
+  recording = setupSpokeRecording({
+    directory: __dirname,
+    name: 'steps',
+  });
+
   const context = createMockStepExecutionContext<IntegrationConfig>({
     instanceConfig: integrationConfig,
   });
@@ -43,7 +60,7 @@ test('should collect data', async () => {
   expect(accounts).toMatchGraphObjectSchema({
     _class: ['Account'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
         _type: { const: 'at_spoke_account' },
         manager: { type: 'string' },
@@ -63,7 +80,7 @@ test('should collect data', async () => {
   expect(users).toMatchGraphObjectSchema({
     _class: ['User'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
         _type: { const: 'at_spoke_user' },
         firstName: { type: 'string' },
@@ -83,9 +100,29 @@ test('should collect data', async () => {
   expect(userGroups).toMatchGraphObjectSchema({
     _class: ['UserGroup'],
     schema: {
-      additionalProperties: false,
+      additionalProperties: true,
       properties: {
-        _type: { const: 'at_spoke_group' },
+        _type: { const: 'at_spoke_team' },
+        _rawData: {
+          type: 'array',
+          items: { type: 'object' },
+        },
+      },
+      required: [],
+    },
+  });
+
+  //webhooks and requests are optional and won't exist on all accts
+  const webhooks = context.jobState.collectedEntities.filter((e) =>
+    e._class.includes('ApplicationEndpoint'),
+  );
+  //expect(webhooks.length).toBeGreaterThan(0);
+  expect(webhooks).toMatchGraphObjectSchema({
+    _class: ['ApplicationEndpoint'],
+    schema: {
+      additionalProperties: true,
+      properties: {
+        _type: { const: 'at_spoke_webhook' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },

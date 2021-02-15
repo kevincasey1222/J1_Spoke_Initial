@@ -107,7 +107,7 @@ export class APIClient {
     // the most light-weight request possible to validate
     // authentication works with the provided credentials, throw an err if
     // authentication fails
-    await this.contactAPI('https://api.askspoke.com/api/v1/whoami');
+    return await this.contactAPI('https://api.askspoke.com/api/v1/whoami');
   }
 
   public async getAccountInfo() {
@@ -189,9 +189,7 @@ export class APIClient {
       !(parseInt(this.config.numRequests) == 0) &&
       parseInt(this.config.numRequests) <= 100
     ) {
-      var paramsToPass;
-
-      paramsToPass = {
+      const paramsToPass = {
         params: {
           start: 0, //starting index of requests. 0 is most recent.
           limit: this.config.numRequests, //doesn't matter that it's a string
