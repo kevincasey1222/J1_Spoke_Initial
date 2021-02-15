@@ -91,25 +91,28 @@ https://github.com/JupiterOne/sdk/blob/master/docs/integrations/development.md
 
 The following entities are created:
 
-| Resources       | Entity `_type`     | Entity `_class`       |
-| --------------- | ------------------ | --------------------- |
-| atSpoke Account | `at_spoke_account` | `Account`             |
-| atSpoke User    | `at_spoke_user`    | `User`                |
-| atSpoke Team    | `at_spoke_team`    | `UserGroup`           |
-| atSpoke Webhook | `at_spoke_webhook` | `ApplicationEndpoint` |
-| atSpoke Request | `at_spoke_request` | `Record`              |
+| Resources            | Entity `_type`         | Entity `_class`       |
+| -------------------- | ---------------------- | --------------------- |
+| atSpoke Account      | `at_spoke_account`     | `Account`             |
+| atSpoke User         | `at_spoke_user`        | `User`                |
+| atSpoke Team         | `at_spoke_team`        | `UserGroup`           |
+| atSpoke Webhook      | `at_spoke_webhook`     | `ApplicationEndpoint` |
+| atSpoke Request Type | `at_spoke_requesttype` | `Record`              |
+| atSpoke Request      | `at_spoke_request`     | `Record`              |
 
 ### Relationships
 
 The following relationships are created/mapped:
 
-| Source Entity `_type` | Relationship `_class` | Target Entity `_type` |
-| --------------------- | --------------------- | --------------------- |
-| `at_spoke_account`    | **HAS**               | `at_spoke_user`       |
-| `at_spoke_account`    | **HAS**               | `at_spoke_team`       |
-| `at_spoke_team`       | **HAS**               | `at_spoke_user`       |
-| `at_spoke_account`    | **HAS**               | `at_spoke_webhook`    |
-| `at_spoke_account`    | **HAS**               | `at_spoke_request`    |
+| Source Entity `_type` | Relationship `_class` | Target Entity `_type`  |
+| --------------------- | --------------------- | ---------------------- |
+| `at_spoke_account`    | **HAS**               | `at_spoke_user`        |
+| `at_spoke_account`    | **HAS**               | `at_spoke_team`        |
+| `at_spoke_team`       | **HAS**               | `at_spoke_user`        |
+| `at_spoke_account`    | **HAS**               | `at_spoke_webhook`     |
+| `at_spoke_account`    | **HAS**               | `at_spoke_requesttype` |
+| `at_spoke_account`    | **HAS**               | `at_spoke_request`     |
+| `at_spoke_request`    | **HAS**               | `at_spoke_requesttype` |
 
 <!--
 ********************************************************************************

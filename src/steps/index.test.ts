@@ -3,13 +3,13 @@ import { createMockStepExecutionContext } from '@jupiterone/integration-sdk-test
 import { IntegrationConfig } from '../types';
 import { fetchGroups, fetchUsers } from './access';
 import { fetchAccountDetails } from './account';
+import { fetchRequests } from './requests';
+import { fetchWebhooks } from './webhooks';
 
-const DEFAULT_CLIENT_ID = 'dummy-acme-client-id';
-const DEFAULT_CLIENT_SECRET = 'dummy-acme-client-secret';
+const DEFAULT_API_KEY = 'dummy-api-key';
 
 const integrationConfig: IntegrationConfig = {
-  clientId: process.env.CLIENT_ID || DEFAULT_CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET || DEFAULT_CLIENT_SECRET,
+  apiKey: process.env.API_KEY || DEFAULT_API_KEY,
 };
 
 test('should collect data', async () => {
@@ -22,6 +22,8 @@ test('should collect data', async () => {
   await fetchAccountDetails(context);
   await fetchUsers(context);
   await fetchGroups(context);
+  await fetchWebhooks(context);
+  await fetchRequests(context);
 
   // Review snapshot, failure is a regression
   expect({
@@ -41,14 +43,14 @@ test('should collect data', async () => {
     schema: {
       additionalProperties: false,
       properties: {
-        _type: { const: 'acme_account' },
+        _type: { const: 'at_spoke_account' },
         manager: { type: 'string' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['manager'],
+      required: ['org'], //we use this to make webLinks to users
     },
   });
 
@@ -61,14 +63,14 @@ test('should collect data', async () => {
     schema: {
       additionalProperties: false,
       properties: {
-        _type: { const: 'acme_user' },
+        _type: { const: 'at_spoke_user' },
         firstName: { type: 'string' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['firstName'],
+      required: ['email'], //we use this to make webLinks and even names if name is blank
     },
   });
 
@@ -81,18 +83,13 @@ test('should collect data', async () => {
     schema: {
       additionalProperties: false,
       properties: {
-        _type: { const: 'acme_group' },
-        logoLink: {
-          type: 'string',
-          // Validate that the `logoLink` property has a URL format
-          format: 'url',
-        },
+        _type: { const: 'at_spoke_group' },
         _rawData: {
           type: 'array',
           items: { type: 'object' },
         },
       },
-      required: ['logoLink'],
+      required: [],
     },
   });
 });

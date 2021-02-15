@@ -49,6 +49,22 @@ export async function fetchRequests({
         to: requestEntity,
       }),
     );
+
+    if (request.requestType) {
+      const requestTypeEntity = await jobState.findEntity(request.requestType);
+      if (!requestTypeEntity) {
+        throw new IntegrationMissingKeyError(
+          `Expected requestType with key to exist (key=${request.requestType})`,
+        );
+      }
+      await jobState.addRelationship(
+        createDirectRelationship({
+          _class: RelationshipClass.HAS,
+          from: requestEntity,
+          to: requestTypeEntity,
+        }),
+      );
+    }
   });
 }
 
@@ -66,7 +82,7 @@ export async function fetchRequestTypes({
         entityData: {
           source: requestType,
           assign: {
-            _type: 'at_spoke_request_type',
+            _type: 'at_spoke_requesttype',
             _class: 'Record',
             _key: requestType.id,
             name: requestType.title,
@@ -85,25 +101,6 @@ export async function fetchRequestTypes({
         to: requestTypeEntity,
       }),
     );
-
-    //Todo: associate requests with request types
-    /*    for (const request of group.users || []) {
-      const userEntity = await jobState.findEntity(user.id);
-
-      if (!userEntity) {
-        throw new IntegrationMissingKeyError(
-          `Expected user with key to exist (key=${user.id})`,
-        );
-      }
-
-      await jobState.addRelationship(
-        createDirectRelationship({
-          _class: RelationshipClass.HAS,
-          from: groupEntity,
-          to: userEntity,
-        }),
-      );
-    } */
   });
 }
 
@@ -122,6 +119,11 @@ export const requestSteps: IntegrationStep<IntegrationConfig>[] = [
         _type: 'at_spoke_request',
         _class: 'Record',
       },
+      {
+        resourceName: 'atSpoke Request Type',
+        _type: 'at_spoke_requesttype',
+        _class: 'Record',
+      },
     ],
     relationships: [
       {
@@ -130,11 +132,17 @@ export const requestSteps: IntegrationStep<IntegrationConfig>[] = [
         sourceType: 'at_spoke_account',
         targetType: 'at_spoke_request',
       },
+      {
+        _type: 'at_spoke_request_has_requesttype',
+        _class: RelationshipClass.HAS,
+        sourceType: 'at_spoke_request',
+        targetType: 'at_spoke_requesttype',
+      },
     ],
-    dependsOn: ['fetch-account'],
+    dependsOn: ['fetch-request-types'],
     executionHandler: fetchRequests,
   },
-  /*{
+  {
     id: 'fetch-request-types',
     name: 'Fetch Request Types',
     entities: [
@@ -144,37 +152,20 @@ export const requestSteps: IntegrationStep<IntegrationConfig>[] = [
         _class: 'Account',
       },
       {
-        resourceName: 'atSpoke Request',
-        _type: 'at_spoke_request',
-        _class: 'Record',
-      },
-      {
         resourceName: 'atSpoke Request Type',
-        _type: 'at_spoke_request_type',
-        _class: '',
+        _type: 'at_spoke_requesttype',
+        _class: 'Record',
       },
     ],
     relationships: [
       {
-        _type: 'at_spoke_account_has_user',
+        _type: 'at_spoke_account_has_requesttype',
         _class: RelationshipClass.HAS,
         sourceType: 'at_spoke_account',
-        targetType: 'at_spoke_user',
-      },
-      {
-        _type: 'at_spoke_account_has_request_type',
-        _class: RelationshipClass.HAS,
-        sourceType: 'at_spoke_account',
-        targetType: 'at_spoke_request_type',
-      },
-      {
-        _type: 'at_spoke_request_type_has_request',
-        _class: RelationshipClass.HAS,
-        sourceType: 'at_spoke_request__type',
-        targetType: 'at_spoke_request',
+        targetType: 'at_spoke_requesttype',
       },
     ],
-    dependsOn: ['fetch-requests'],
+    dependsOn: ['fetch-account'],
     executionHandler: fetchRequestTypes,
-  },*/
+  },
 ];
