@@ -10,7 +10,8 @@ import { fetchAccountDetails } from './account';
 import { fetchRequests } from './requests';
 import { fetchWebhooks } from './webhooks';
 
-const DEFAULT_API_KEY = 'AtFbNFj2hvzt7pGkg_zgW7ksihiFaVrVwttLKxU2oRVU=';
+const DEFAULT_API_KEY = 'fake_api_key'; // works because we have a recording now
+//AtFbNFj2hvzt7pGkg_zgW7ksihiFaVrVwttLKxU2oRVU=';
 const DEFAULT_API_REQUESTS = '5';
 
 const integrationConfig: IntegrationConfig = {

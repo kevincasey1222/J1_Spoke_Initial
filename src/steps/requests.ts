@@ -5,7 +5,6 @@ import {
   IntegrationStep,
   IntegrationStepExecutionContext,
   RelationshipClass,
-  //IntegrationMissingKeyError,
 } from '@jupiterone/integration-sdk-core';
 
 import { createAPIClient } from '../client';
@@ -49,22 +48,19 @@ export async function fetchRequests({
         to: requestEntity,
       }),
     );
-    /*
+
     if (request.requestType) {
       const requestTypeEntity = await jobState.findEntity(request.requestType);
-      if (!requestTypeEntity) {
-        throw new IntegrationMissingKeyError(
-          `Expected requestType with key to exist (key=${request.requestType})`,
+      if (requestTypeEntity) {
+        await jobState.addRelationship(
+          createDirectRelationship({
+            _class: RelationshipClass.HAS,
+            from: requestEntity,
+            to: requestTypeEntity,
+          }),
         );
       }
-      await jobState.addRelationship(
-        createDirectRelationship({
-          _class: RelationshipClass.HAS,
-          from: requestEntity,
-          to: requestTypeEntity,
-        }),
-      );
-    } */
+    }
   });
 }
 
