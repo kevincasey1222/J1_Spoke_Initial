@@ -7,9 +7,11 @@ import { fetchRequests } from './requests';
 import { fetchWebhooks } from './webhooks';
 
 const DEFAULT_API_KEY = 'dummy-api-key';
+const DEFAULT_API_REQUESTS = '0';
 
 const integrationConfig: IntegrationConfig = {
   apiKey: process.env.API_KEY || DEFAULT_API_KEY,
+  numRequests: process.env.NUM_REQUESTS || DEFAULT_API_REQUESTS,
 };
 
 test('should collect data', async () => {

@@ -9,4 +9,5 @@ export interface IntegrationConfig extends IntegrationInstanceConfig {
    * The provider API key used to authenticate requests.
    */
   apiKey: string;
+  numRequests: string;
 }

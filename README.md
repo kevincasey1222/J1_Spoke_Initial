@@ -41,6 +41,9 @@ const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
     type: 'string',
     mask: true,
   },
+  numRequests: {
+    type: 'string',
+  },
 };
 
 export default instanceConfigFields;
@@ -50,12 +53,13 @@ You would provide a `.env` file like this:
 
 ```bash
 API_KEY="gobbeldygookgobbeldygook="
+NUM_REQUESTS="10"
 ```
 
 The snake cased environment variables will automatically be converted and
 applied to the camel cased configuration field. So for example, `API_KEY` will
-apply to the `apiKey` config field. If there were more fields, `CLIENT_SECRET`
-would apply to `clientSecret`, and `MY_SUPER_SECRET_CONFIGURATION_VALUE` would
+apply to the `apiKey` config field. If there were more fields, `NUM_REQUESTS`
+would apply to `numRequests`, and `MY_SUPER_SECRET_CONFIGURATION_VALUE` would
 apply to a `mySuperSecretConfigurationValue` configuration field.
 
 ## Getting an API Key from atSpoke
@@ -65,6 +69,14 @@ generate a token at the bottom of the page. Note you can only have one token for
 the whole atSpoke account, and it has access to all things. Also note that you
 can only create an API token if you have a Business or Enterprise level account
 (the basic Teams account does not provide API functionality).
+
+## Configuring the number of requests desired in your JupiterOne graph
+
+Requests are the support tickets in atSpoke. You can configure this integration
+to pull in the most recent X number of tickets with the env variable
+NUM_REQUESTS="X". If you set X to 0, atSpoke requests will not be pulled in to
+the graph. Note that the current max for X is 100. Invalid entries (letters,
+negative numbers, numbers above 100), will be treated as 0.
 
 ## Running the integration
 

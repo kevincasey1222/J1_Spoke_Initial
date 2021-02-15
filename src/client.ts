@@ -6,8 +6,6 @@ import { IntegrationConfig } from './types';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
-// Providers often supply types with their API libraries.
-
 type AtSpokeUser = {
   id: string;
   displayName: string;
@@ -80,12 +78,6 @@ type AtSpokeRequestType = {
   title: string;
   description: string;
 };
-
-/*
-import { Opaque } from 'type-fest';
-export type AcmeUser = Opaque<any, 'AcmeUser'>;
-export type AcmeGroup = Opaque<any, 'AcmeGroup'>;
-*/
 
 /**
  * An APIClient maintains authentication state and provides an interface to
@@ -193,14 +185,30 @@ export class APIClient {
   public async iterateRequests(
     iteratee: ResourceIteratee<AtSpokeRequest>,
   ): Promise<void> {
-    const reply = await this.contactAPI(
-      'https://api.askspoke.com/api/v1/requests',
-    );
+    if (
+      !(parseInt(this.config.numRequests) == 0) &&
+      parseInt(this.config.numRequests) <= 100
+    ) {
+      var paramsToPass;
 
-    const requests: AtSpokeRequest[] = reply.results;
+      paramsToPass = {
+        params: {
+          start: 0, //starting index of requests. 0 is most recent.
+          limit: this.config.numRequests, //doesn't matter that it's a string
+          status: 'OPEN,RESOLVED',
+        },
+      };
 
-    for (const request of requests) {
-      await iteratee(request);
+      const reply = await this.contactAPI(
+        'https://api.askspoke.com/api/v1/requests',
+        paramsToPass,
+      );
+
+      const requests: AtSpokeRequest[] = reply.results;
+
+      for (const request of requests) {
+        await iteratee(request);
+      }
     }
   }
 
@@ -223,10 +231,10 @@ export class APIClient {
     }
   }
 
-  public async contactAPI(url) {
+  public async contactAPI(url, params?) {
     let reply;
     try {
-      reply = await this.getClient().get(url);
+      reply = await this.getClient().get(url, params);
       if (reply.status != 200) {
         throw new IntegrationProviderAuthenticationError({
           endpoint: url,
